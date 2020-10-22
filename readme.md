@@ -1,9 +1,25 @@
-# Amazon Polly TTS Engine for Windows
-> Use Amazon Polly voices in native Windows TTS applications
+# Qeslin Player for Windows
+> Use Amazon Polly voices with VBCABLE for TTS using common VoIP applications.
+
+## End-User Instructions
+
+1. A developer should have provided you with an .exe setup file of Qeslin Player. Run that, and follow the prompts, answering "Next", "Yes" or "OK" to all.
+2. Run the program "Qeslin Player" from the start menu.
+3. When prompted, navigate to your home directory and select the file "qeslin-iam.json".
+4. When prompted, enter the password supplied to you by your developer.
+5. Test out the program with a few sample strings of text, making sure to select an output device that you can hear through your speakers or headphones.
+6. Go into your favorite Voice Over IP (VoIP) application (examples: Skype, Discord, ...) and set the "Input" device to the VB-CABLE device.
+7. Set your VoIP application to Push To Talk.
+8. Get a friend to help you test and tell you whether they can hear your speech as you enter lines into Qeslin Player.
+
+
+## Developer Instructions
+
+These notes are for *developers* planning to create a distribution of Qeslin Player.
 
 ## Setting Up Your Development Environment
 
-1. Install [Visual Studio 2019](https://visualstudio.microsoft.com/downloads/)
+1. Install [Visual Studio 2019 - Community, Professional, or Enterprise](https://visualstudio.microsoft.com/downloads/)
 2. Install vcpkg
 ````
 > git clone https://github.com/Microsoft/vcpkg.git
@@ -11,6 +27,44 @@
 
 PS> .\bootstrap-vcpkg.bat
 ````
+
+## Qeslin Player Installer Preparation
+
+1. Download VB-Cable from https://vb-audio.com/Cable/ and place the extracted folder in the root of the repository.
+2. Download InnoSetup from https://jrsoftware.org/isdl.php and run the setup installer.
+3. Create credentials as per the instructions under "Setup AWS IAM Account" and "Create Credentials" headings.
+4. Run InnoSetup's "Compile" option against the .iss file. It will build in the "installer" folder of the root of the repository clone.
+5. Distribute the resulting .exe to your end-users and give them the password you used to create the encrypted credential.
+
+## Setup AWS IAM Account
+
+1. Create an AWS account if you don't have one.
+2. Login to [your AWS account](https://console.aws.amazon.com/console/home)
+3. After you've logged in, click `Services` from the top menu bar, then type `iam` in the search box. Click `IAM` when it pops up.
+4. On the left, click `Users`
+5. Click `Add User`
+6. Type in `polly-windows-user` (you can use any name)
+7. Click the `Programmatic access` checkbox and leave `AWS Management Console access` unchecked
+8. Click `Next: Permissions`
+9. Click `Attach existing policies directly`
+10. At the bottom of the page, in the search box next to `Filter: Policy type`, type `polly`
+11. Click the checkbox next to `AmazonPollyFullAccess`
+12. Click `Next: Review`
+13. Click `Create user`
+> **IMPORTANT:** *Don't close the web page. You'll need both the `Access key ID` and the `Secret access key` in the next step.*
+
+## Create Credentials
+
+1. Open the PollyPlayer.sln solution in Visual Studio 2019.
+2. Build the solution.
+3. Run PollyPlayer\bin\Debug\Crypter.exe
+4. Follow the instructions in the console to create your *encrypted IAM credentials file*. You will need your IAM user's access key and secret access key.
+5. Make sure you save your 32-character encryption password! You will need to provide this to your end user(s).
+6. Copy the IAM credentials file to the folder "PrivateData" in your local clone of this GitHub repository's root directory.
+
+--------
+
+# Old instructions from AWS
 
 ## Installation QuickStart
 
