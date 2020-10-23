@@ -35,13 +35,15 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.saveToFile = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.lblCredsFile = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.cbSoundDevice = new System.Windows.Forms.ComboBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.lblCredsFile = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.saveToFile = new System.Windows.Forms.Button();
+            this.listenAndChat = new System.Windows.Forms.CheckBox();
+            this.delAfterSay = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -108,8 +110,21 @@
             this.panel1.Size = new System.Drawing.Size(860, 579);
             this.panel1.TabIndex = 5;
             // 
+            // saveToFile
+            // 
+            this.saveToFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.saveToFile.Location = new System.Drawing.Point(353, 540);
+            this.saveToFile.Name = "saveToFile";
+            this.saveToFile.Size = new System.Drawing.Size(492, 33);
+            this.saveToFile.TabIndex = 3;
+            this.saveToFile.Text = "Save Audio To File";
+            this.saveToFile.UseVisualStyleBackColor = true;
+            this.saveToFile.Click += new System.EventHandler(this.saveToFile_Click);
+            // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.delAfterSay);
+            this.groupBox1.Controls.Add(this.listenAndChat);
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.lblCredsFile);
             this.groupBox1.Controls.Add(this.label4);
@@ -121,6 +136,35 @@
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Options";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(405, 16);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(127, 23);
+            this.button1.TabIndex = 10;
+            this.button1.Text = "Pick New Credentials";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // lblCredsFile
+            // 
+            this.lblCredsFile.AutoSize = true;
+            this.lblCredsFile.Location = new System.Drawing.Point(194, 51);
+            this.lblCredsFile.Name = "lblCredsFile";
+            this.lblCredsFile.Size = new System.Drawing.Size(163, 13);
+            this.lblCredsFile.TabIndex = 9;
+            this.lblCredsFile.Text = "(None - Program will not function)";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(190, 16);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(208, 24);
+            this.label4.TabIndex = 8;
+            this.label4.Text = "AWS Credentials File";
             // 
             // label3
             // 
@@ -140,45 +184,28 @@
             this.cbSoundDevice.Size = new System.Drawing.Size(171, 21);
             this.cbSoundDevice.TabIndex = 0;
             // 
-            // label4
+            // listenAndChat
             // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(190, 16);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(208, 24);
-            this.label4.TabIndex = 8;
-            this.label4.Text = "AWS Credentials File";
+            this.listenAndChat.AutoSize = true;
+            this.listenAndChat.Location = new System.Drawing.Point(405, 45);
+            this.listenAndChat.Name = "listenAndChat";
+            this.listenAndChat.Size = new System.Drawing.Size(332, 30);
+            this.listenAndChat.TabIndex = 11;
+            this.listenAndChat.Text = "Listen And Chat\r\nSelect this to chat and hear what\'s being played at the same tim" +
+    "e";
+            this.listenAndChat.UseVisualStyleBackColor = true;
+            this.listenAndChat.CheckedChanged += new System.EventHandler(this.listenAndChat_CheckedChanged);
             // 
-            // lblCredsFile
+            // delAfterSay
             // 
-            this.lblCredsFile.AutoSize = true;
-            this.lblCredsFile.Location = new System.Drawing.Point(194, 51);
-            this.lblCredsFile.Name = "lblCredsFile";
-            this.lblCredsFile.Size = new System.Drawing.Size(163, 13);
-            this.lblCredsFile.TabIndex = 9;
-            this.lblCredsFile.Text = "(None - Program will not function)";
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(405, 16);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(127, 23);
-            this.button1.TabIndex = 10;
-            this.button1.Text = "Pick New Credentials";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // saveToFile
-            // 
-            this.saveToFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.saveToFile.Location = new System.Drawing.Point(353, 540);
-            this.saveToFile.Name = "saveToFile";
-            this.saveToFile.Size = new System.Drawing.Size(492, 33);
-            this.saveToFile.TabIndex = 3;
-            this.saveToFile.Text = "Save Audio To File";
-            this.saveToFile.UseVisualStyleBackColor = true;
-            this.saveToFile.Click += new System.EventHandler(this.saveToFile_Click);
+            this.delAfterSay.AutoSize = true;
+            this.delAfterSay.Location = new System.Drawing.Point(538, 20);
+            this.delAfterSay.Name = "delAfterSay";
+            this.delAfterSay.Size = new System.Drawing.Size(120, 17);
+            this.delAfterSay.TabIndex = 12;
+            this.delAfterSay.Text = "Clear Text After Say";
+            this.delAfterSay.UseVisualStyleBackColor = true;
+            this.delAfterSay.CheckedChanged += new System.EventHandler(this.delAfterSay_CheckedChanged);
             // 
             // MainForm
             // 
@@ -217,6 +244,8 @@
         private System.Windows.Forms.Label lblCredsFile;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button saveToFile;
+        private System.Windows.Forms.CheckBox listenAndChat;
+        private System.Windows.Forms.CheckBox delAfterSay;
     }
 }
 

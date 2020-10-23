@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Qeslin Player"
-#define MyAppVersion ".1"
+#define MyAppVersion "0.2"
 #define MyAppPublisher "Sean McNamara"
 #define MyAppURL "https://github.com/allquixotic/qeslin-player"
 #define DebugOrRelease "Release"
@@ -37,10 +37,10 @@ DisableWelcomePage=yes
 ArchitecturesInstallIn64BitMode=x64
 
 [Files]
-Source: ".\PrivateData\*"; DestDir: "{%USERPROFILE}"; Flags: ignoreversion 64bit; Check: IsWin64
+Source: ".\PrivateData\*"; DestDir: "{%USERPROFILE}"; Flags: skipifsourcedoesntexist ignoreversion confirmoverwrite ignoreversion 64bit; Check: IsWin64
 Source: ".\PollyPlayer\bin\{#DebugOrRelease}\QeslinPlayer.exe"; DestDir: "{app}"; Flags: ignoreversion 64bit; Check: IsWin64
 Source: ".\redist\vc_redist.x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall
-Source: ".\VBCABLE_Driver_Pack43\*"; DestDir: "{app}\VBCABLE"
+Source: ".\VBCABLE_Driver_Pack43\*"; DestDir: "{app}\VBCABLE"; Flags: recursesubdirs
 
 [Icons]
 Name: "{group}\Qeslin Player"; Filename: "{app}\QeslinPlayer.exe"; WorkingDir: "{app}"

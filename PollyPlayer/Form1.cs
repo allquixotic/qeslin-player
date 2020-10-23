@@ -1,20 +1,17 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Amazon;
 using Amazon.Polly;
 using Amazon.Polly.Model;
 using Amazon.Runtime;
-using Amazon.Runtime.CredentialManagement;
 using CSCore;
 using CSCore.Codecs.MP3;
+using CSCore.CoreAudioAPI;
 using CSCore.DirectSound;
 using CSCore.SoundOut;
 using Microsoft.VisualBasic;
@@ -37,6 +34,8 @@ namespace PollyPlayer
             public string key { get; set; }
             public string credentialsFile { get; set; }
             public string voiceId { get; set; }
+            public bool clearAfterSay { get; set; }
+            public bool listenAndChat { get; set; }
         }
 
         public struct Creds
@@ -92,12 +91,12 @@ namespace PollyPlayer
             voicesListBox.ValueMember = "Value";
         }
 
-        public static Dictionary<string, DirectSoundDevice> LoadDevices()
+        public static Dictionary<string, MMDevice> LoadDevices()
         {
-            var devices = new Dictionary<string, DirectSoundDevice>();
-            foreach (var dsound in DirectSoundDeviceEnumerator.EnumerateDevices())
+            var devices = new Dictionary<string, MMDevice>();
+            foreach (var dev in MMDeviceEnumerator.EnumerateDevices(DataFlow.Render, DeviceState.Active))
             {
-                devices.Add(dsound.Description, dsound);
+                devices.Add(dev.FriendlyName, dev);
             }
 
             return devices;
@@ -244,6 +243,8 @@ namespace PollyPlayer
             AWSCredentials creds;
             (sett, mycreds, creds) = GetCredentials();
             lblCredsFile.Text = sett.credentialsFile;
+            listenAndChat.Checked = sett.listenAndChat;
+            delAfterSay.Checked = sett.clearAfterSay;
             apc = new AmazonPollyClient(creds, RegionEndpoint.USEast1);
             LoadVoices();
 
@@ -259,7 +260,7 @@ namespace PollyPlayer
             cbSoundDevice.DataSource = new BindingSource(devs, null);
             cbSoundDevice.DisplayMember = "Key";
             cbSoundDevice.ValueMember = "Value";
-            DirectSoundDevice devToSet = null;
+            MMDevice devToSet = null;
             foreach (var dev in devs)
             {
                 if (dev.Key.ToLower().Trim().Equals("vb-audio virtual cable"))
@@ -281,9 +282,8 @@ namespace PollyPlayer
             cbSoundDevice.SelectedValue = devToSet;
         }
 
-        private Stream RenderAudio()
+        private Stream RenderAudio(Voice voice)
         {
-            var voice = (Voice)voicesListBox.SelectedValue;
             var ssr = new SynthesizeSpeechRequest
             {
                 Engine = Engine.Neural,
@@ -303,37 +303,61 @@ namespace PollyPlayer
 
         private void DoSpeak()
         {
-            var mp3 = RenderAudio();
+            sayItButton.Enabled = false;
+            var dsd = (MMDevice) cbSoundDevice.SelectedValue;
+            var voice = (Voice)voicesListBox.SelectedValue;
 
-            //Contains the sound to play
-            using (IWaveSource soundSource = GetSoundSource(mp3))
+            var tsk = Task.Run(() =>
             {
-                //SoundOut implementation which plays the sound
-                using (ISoundOut soundOut = GetSoundOut((DirectSoundDevice)cbSoundDevice.SelectedValue))
-                {
-                    //Tell the SoundOut which sound it has to play
-                    soundOut.Initialize(soundSource);
-                    //Play the sound
-                    soundOut.Play();
+                var mp3 = RenderAudio(voice);
 
-                    while (soundOut.PlaybackState == PlaybackState.Playing)
+                //Contains the sound to play
+                using (IWaveSource soundSource = GetSoundSource(mp3))
+                {
+                    //SoundOut implementation which plays the sound
+                    using (ISoundOut soundOut = GetSoundOut(dsd))
                     {
-                        Thread.Sleep(250);
+                        //Tell the SoundOut which sound it has to play
+                        soundOut.Initialize(soundSource);
+                        //Play the sound
+                        soundOut.Play();
+
+                        while (soundOut.PlaybackState == PlaybackState.Playing)
+                        {
+                            Thread.Sleep(250);
+                        }
+
+                        //Stop the playback
+                        soundOut.Stop();
+                    }
+                }
+
+                this.Invoke((MethodInvoker) delegate
+                {
+                    if (delAfterSay.Checked)
+                    {
+                        speechTextBox.Clear();
                     }
 
-                    //Stop the playback
-                    soundOut.Stop();
-                }
-            }
-
-            speechTextBox.Clear();
-            speechTextBox.Focus();
+                    sayItButton.Enabled = true;
+                    speechTextBox.Focus();
+                });
+            });
         }
 
-        private ISoundOut GetSoundOut(DirectSoundDevice dso)
+        private ISoundOut GetSoundOut(MMDevice dso)
         {
-            var retval = new DirectSoundOut();
-            retval.Device = dso.Guid;
+            ISoundOut retval;
+            if (listenAndChat.Checked)
+            {
+                retval = new CompositeWasapiOut(dso);
+            }
+            else
+            {
+                retval = new WasapiOut();
+                ((WasapiOut)retval).Device = dso;
+            }
+            
             return retval;
         }
 
@@ -341,7 +365,6 @@ namespace PollyPlayer
         {
             // Instead of using the CodecFactory as helper, you specify the decoder directly:
             return new DmoMp3Decoder(stream);
-
         }
 
         private void SayItButton_Click(object sender, EventArgs e)
@@ -384,7 +407,7 @@ namespace PollyPlayer
 
         private void saveToFile_Click(object sender, EventArgs e)
         {
-            var mp3 = RenderAudio();
+            var mp3 = RenderAudio((Voice)voicesListBox.SelectedValue);
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.AddExtension = true;
             sfd.DefaultExt = "mp3";
@@ -401,6 +424,18 @@ namespace PollyPlayer
 
                 MessageBox.Show(this, "Saved " + sfd.FileName + " with mp3 data.", "Information");
             }
+        }
+
+        private void delAfterSay_CheckedChanged(object sender, EventArgs e)
+        {
+            sett.clearAfterSay = delAfterSay.Checked;
+            SaveSettings();
+        }
+
+        private void listenAndChat_CheckedChanged(object sender, EventArgs e)
+        {
+            sett.listenAndChat = listenAndChat.Checked;
+            SaveSettings();
         }
     }
 }
