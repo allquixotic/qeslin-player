@@ -84,6 +84,7 @@ namespace PollyPlayer
                 MemoryStream ms = new MemoryStream();
                 source.WriteToWaveStream(ms);
                 ms.Position = 0;
+                source.Position = 0;
                 WaveFileReader wfr = new WaveFileReader(ms);
                 ((ISoundOut)primaryOut).Initialize(wfr);
             }
