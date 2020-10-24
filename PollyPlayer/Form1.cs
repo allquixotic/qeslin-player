@@ -30,6 +30,59 @@ namespace PollyPlayer
 
         private readonly SortedDictionary<string, Voice> vozes = new SortedDictionary<string, Voice>();
 
+        private readonly Dictionary<string, string> speeds = new Dictionary<string, string>()
+        {
+            {"Extra Slow", "x-slow"},
+            {"Slow", "slow"},
+            {"Medium", "medium"},
+            {"Fast", "fast"},
+            {"Extra Fast", "x-fast"}
+        };
+
+        private readonly Dictionary<string, string> pitches = new Dictionary<string, string>()
+        {
+            {"Extra Low", "x-low"},
+            {"Low", "low"},
+            {"Medium", "medium"},
+            {"High", "high"},
+            {"Extra High", "x-high"}
+        };
+
+        private readonly Dictionary<string, string> volumes = new Dictionary<string, string>()
+        {
+            {"Silent", "silent"},
+            {"Extra Soft", "x-soft"},
+            {"Soft", "soft"},
+            {"Medium", "medium"},
+            {"Loud", "loud"},
+            {"Extra Loud", "x-loud"}
+        };
+
+        private readonly List<string> domainVoiceIds = new List<string>()
+        {
+            "joanna",
+            "matthew"
+        };
+
+        private readonly Dictionary<string, string> tones = new Dictionary<string, string>()
+        {
+            {"Normal", "normal"},
+            {"Soft", "soft"},
+            {"Whisper", "whispered"}
+        };
+
+        private readonly List<string> timbres = new List<string>()
+        {
+            "-50%", "-25%", "-10%", "-5%", "0%", "+5%", "+10%", "+25%", "+50%", "+100%"
+        };
+
+        private bool ssml
+        {
+            get => rbssml.Checked;
+        }
+
+        private bool stopRequested = false;
+
         public struct MySettings
         {
             public string key { get; set; }
@@ -286,19 +339,158 @@ namespace PollyPlayer
             }
             cbSoundDevice.SelectedValue = devToSet;
             this.voicesListBox.SelectedIndexChanged += new System.EventHandler(this.voicesListBox_SelectedIndexChanged);
+
+            this.cbspeed.DataSource = new BindingSource(speeds, null);
+            this.cbspeed.DisplayMember = "Key";
+            this.cbspeed.ValueMember = "Value";
+            this.cbspeed.SelectedValue = "medium";
+
+            this.cbpitch.DataSource = new BindingSource(pitches, null);
+            this.cbpitch.DisplayMember = "Key";
+            this.cbpitch.ValueMember = "Value";
+            this.cbpitch.SelectedValue = "medium";
+
+            this.cbvolume.DataSource = new BindingSource(volumes, null);
+            this.cbvolume.DisplayMember = "Key";
+            this.cbvolume.ValueMember = "Value";
+            this.cbvolume.SelectedValue = "medium";
+
+            this.cbtone.DataSource = new BindingSource(tones, null);
+            this.cbtone.DisplayMember = "Key";
+            this.cbtone.ValueMember = "Value";
+            this.cbtone.SelectedValue = "normal";
+
+            this.cbtimbre.DataSource = new BindingSource(timbres, null);
+            this.cbtimbre.SelectedItem = "0%";
+
+            EnabledDisableBySpeaker();
         }
 
-        private Stream RenderAudio(Voice voice)
+        private string toneToTag(string tone)
+        {
+            switch (tone)
+            {
+                case "soft":
+                    return "<amazon:effect phonation=\"soft\">";
+                case "whispered":
+                    return "<amazon:effect name=\"whispered\">";
+                default:
+                    return "";
+            }
+        }
+
+        private string timbreToTag(string timbre)
+        {
+            if (String.IsNullOrWhiteSpace(timbre) || timbre == "0%") return "";
+
+            return "<amazon:effect vocal-tract-length=\"" + timbre + "\">";
+        }
+
+        private string ParseProsody(string pitch, string speed, string volume, bool neural)
+        {
+            if (new List<string>() {pitch, speed, volume}.TrueForAll((p) =>
+                String.IsNullOrWhiteSpace(p) || p.ToLower().Equals("normal")))
+                return "";
+
+            var sb = new StringBuilder();
+            sb.Append("<prosody ");
+            if (!neural && pitch != "medium")
+                sb.Append($"pitch=\"{pitch}\" ");
+            if (speed != "medium")
+                sb.Append($"rate=\"{speed}\" ");
+            if (volume != "medium")
+                sb.Append($"volume=\"{volume}\"");
+            sb.Append(">");
+            return sb.ToString().Trim();
+        }
+
+        private string EscapeSsml(string text)
+        {
+            return text.Replace("\"", "&quot;").Replace("&", "&amp;")
+                .Replace("'", "&apos;")
+                .Replace("<", "&lt;")
+                .Replace(">", "&gt;");
+        }
+
+        private string BuildTextFromOptions(string text, string pitch, string speed, string volume, string timbre, string tone, bool breathing, bool news, bool convo, bool neural, bool isSsml)
+        {
+            var sb = new StringBuilder();
+            bool hasSpeak = text.Contains("<speak>");
+            bool hasEndSpeak = text.Contains("</speak>");
+
+            //Pitch: Non-Neural Only
+            //Speed: All
+            //Volume: All
+            string prosodyStart = ParseProsody(pitch, speed, volume, neural);
+            string prosodyEnd = String.IsNullOrWhiteSpace(prosodyStart) ? "" : "</prosody>";
+
+            //Timbre: Non-Neural Only
+            string timbreStart = !neural ? timbreToTag(timbre) : "";
+            string timbreEnd = String.IsNullOrWhiteSpace(timbreStart) ? "" : "</amazon:effect>";
+
+            //Tone: Non-Neural Only
+            string toneStart = !neural ? toneToTag(tone) : "";
+            string toneEnd = String.IsNullOrWhiteSpace(toneStart) ? "" : "</amazon:effect>";
+
+            //Breathing: Non-Neural Only
+            string breathStart = !neural && breathing ? "<amazon:auto-breaths>" : "";
+            string breathEnd = String.IsNullOrWhiteSpace(breathStart) ? "" : "</amazon:auto-breaths>";
+
+            //Conversation Style: Neural + Joanna/Matthew Only (IsDomainSpeaker)
+            string domainStart = IsDomainSpeaker && (news || convo)
+                ? (news ? "<amazon:domain name=\"news\">" : "<amazon:domain name=\"conversational\">")
+                : "";
+            string domainEnd = String.IsNullOrWhiteSpace(domainStart) ? "" : "</amazon:domain>";
+
+
+            var allStarts = new List<string>()
+            {
+                prosodyStart, timbreStart, toneStart, breathStart, domainStart
+            };
+            var allEnds = new List<string>()
+            {
+                domainEnd, breathEnd, toneEnd, timbreEnd, prosodyEnd
+            };
+            bool anyFx =
+                allStarts.Exists((p) => !String.IsNullOrWhiteSpace(p));
+
+            if (anyFx && !hasSpeak)
+            {
+                sb.Append("<speak>");
+            }
+
+            allStarts.ForEach((em) => sb.Append(em));
+
+            if (anyFx && !isSsml)
+            {
+                sb.Append(EscapeSsml(text));
+            }
+            else
+            {
+                sb.Append(text);
+            }
+
+            allEnds.ForEach((em) => sb.Append(em));
+
+            if (anyFx && !hasEndSpeak)
+            {
+                sb.Append("</speak>");
+            }
+
+            return sb.ToString().Trim();
+        }
+
+        private Stream RenderAudio(Voice voice, string origText, string btfo)
         {
             var ssr = new SynthesizeSpeechRequest
             {
-                Engine = voice.SupportedEngines.Contains("neural") ? Engine.Neural : Engine.Standard,
+                Engine = SelectedVoiceSupportsNeural(voice) ? Engine.Neural : Engine.Standard,
                 OutputFormat = "mp3",
                 LanguageCode = voice.LanguageCode,
                 VoiceId = voice.Id,
-                TextType = TextType.Text,
+                TextType = ssml || btfo != origText ? TextType.Ssml : TextType.Text,
                 SampleRate = "24000",
-                Text = speechTextBox.Text
+                Text = btfo
             };
             var resp = apc.SynthesizeSpeech(ssr);
             var mp3 = new MemoryStream();
@@ -309,45 +501,71 @@ namespace PollyPlayer
 
         private void DoSpeak()
         {
-            sayItButton.Enabled = false;
+            sayItButton.Text = "Stop";
             var dsd = (MMDevice) cbSoundDevice.SelectedValue;
             var voice = (Voice)voicesListBox.SelectedValue;
+            var pitch = (string)cbpitch.SelectedValue;
+            var speed = (string)cbspeed.SelectedValue;
+            var volume = (string)cbvolume.SelectedValue;
+            var timbre = (string)cbtimbre.SelectedItem;
+            var tone = (string)cbtone.SelectedValue;
+            var breathing = cbbreath.Checked;
+            var news = rbnews.Checked;
+            var convo = rbconv.Checked;
+            var neural = SelectedVoiceSupportsNeural();
+            var text = speechTextBox.Text;
+            var btfo = BuildTextFromOptions(text: text, pitch: pitch, speed: speed, volume: volume, timbre: timbre,
+                tone: tone, breathing: breathing, news: news, convo: convo, neural: neural, isSsml: ssml);
 
             var tsk = Task.Run(() =>
             {
-                var mp3 = RenderAudio(voice);
-
-                //Contains the sound to play
-                using (IWaveSource soundSource = GetSoundSource(mp3))
-                {
-                    //SoundOut implementation which plays the sound
-                    using (ISoundOut soundOut = GetSoundOut(dsd))
-                    {
-                        //Tell the SoundOut which sound it has to play
-                        soundOut.Initialize(soundSource);
-                        //Play the sound
-                        soundOut.Play();
-
-                        while (soundOut.PlaybackState == PlaybackState.Playing)
-                        {
-                            Thread.Sleep(250);
-                        }
-
-                        //Stop the playback
-                        soundOut.Stop();
-                    }
-                }
-
-                this.Invoke((MethodInvoker) delegate
+                var mp3 = RenderAudio(voice: voice, origText: text, btfo: btfo);
+                MethodInvoker dd = (MethodInvoker) delegate
                 {
                     if (delAfterSay.Checked)
                     {
                         speechTextBox.Clear();
                     }
 
-                    sayItButton.Enabled = true;
+                    sayItButton.Text = "Say It (Ctrl+Enter)";
                     speechTextBox.Focus();
-                });
+                };
+
+                //Contains the sound to play
+                using (IWaveSource soundSource = GetSoundSource(mp3))
+                {
+                    if (soundSource.GetLength() > TimeSpan.FromMilliseconds(1.0d))
+                    {
+                        //SoundOut implementation which plays the sound
+                        using (ISoundOut soundOut = GetSoundOut(dsd))
+                        {
+                            //Tell the SoundOut which sound it has to play
+                            soundOut.Initialize(soundSource);
+                            //Play the sound
+                            soundOut.Play();
+
+                            while (soundOut.PlaybackState == PlaybackState.Playing)
+                            {
+                                if (stopRequested)
+                                {
+                                    soundOut.Stop();
+                                    this.Invoke(dd);
+                                    stopRequested = false;
+                                    break;
+                                }
+                                else
+                                {
+                                    Thread.Sleep(250);
+                                }
+                            }
+
+                            //Stop the playback
+                            soundOut.Stop();
+                        }
+                    }
+                }
+
+                this.Invoke(dd);
             });
         }
 
@@ -375,7 +593,29 @@ namespace PollyPlayer
 
         private void SayItButton_Click(object sender, EventArgs e)
         {
-            DoSpeak();
+            if (sayItButton.Text.Equals("Stop"))
+            {
+                stopRequested = true;
+            }
+            else
+            {
+                stopRequested = false;
+                DoSpeak();
+            }
+        }
+
+        private bool IsDomainSpeaker
+        {
+            get => domainVoiceIds.Contains(sett.voiceId.ToLower());
+        }
+
+
+
+        private void EnabledDisableBySpeaker()
+        {
+            bool neural = SelectedVoiceSupportsNeural();
+            cbtimbre.Enabled = cbtone.Enabled = cbbreath.Enabled = cbpitch.Enabled = !neural;
+            rbnews.Enabled = rbconv.Enabled = IsDomainSpeaker;
         }
 
         private void voicesListBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -392,6 +632,9 @@ namespace PollyPlayer
                 sett.voiceId = v?.Value?.Id?.Value;
             }
             SaveSettings();
+
+            
+            EnabledDisableBySpeaker();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -413,7 +656,20 @@ namespace PollyPlayer
 
         private void saveToFile_Click(object sender, EventArgs e)
         {
-            var mp3 = RenderAudio((Voice)voicesListBox.SelectedValue);
+            var voice = (Voice)voicesListBox.SelectedValue;
+            var pitch = (string)cbpitch.SelectedValue;
+            var speed = (string)cbspeed.SelectedValue;
+            var volume = (string)cbvolume.SelectedValue;
+            var timbre = (string)cbtimbre.SelectedItem;
+            var tone = (string)cbtone.SelectedValue;
+            var breathing = cbbreath.Checked;
+            var news = rbnews.Checked;
+            var convo = rbconv.Checked;
+            var neural = SelectedVoiceSupportsNeural();
+            var text = speechTextBox.Text;
+            var btfo = BuildTextFromOptions(text: text, pitch: pitch, speed: speed, volume: volume, timbre: timbre,
+                tone: tone, breathing: breathing, news: news, convo: convo, neural: neural, isSsml: ssml);
+            var mp3 = RenderAudio(voice, text, btfo);
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.AddExtension = true;
             sfd.DefaultExt = "mp3";
@@ -492,5 +748,12 @@ namespace PollyPlayer
             speechTextBox.Text = sb.ToString().Trim();
 
         }
+
+        private bool SelectedVoiceSupportsNeural(Voice v = null)
+        {
+            var vee = v == null ? (Voice) voicesListBox.SelectedValue : v;
+            return vee.SupportedEngines.Contains("neural");
+        }
+
     }
 }

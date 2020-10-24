@@ -35,6 +35,20 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.cbpitch = new System.Windows.Forms.ComboBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.cbtimbre = new System.Windows.Forms.ComboBox();
+            this.cbtone = new System.Windows.Forms.ComboBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.cbvolume = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.cbspeed = new System.Windows.Forms.ComboBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.rbnone = new System.Windows.Forms.RadioButton();
+            this.rbnews = new System.Windows.Forms.RadioButton();
+            this.rbconv = new System.Windows.Forms.RadioButton();
             this.saveToFile = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.delAfterSay = new System.Windows.Forms.CheckBox();
@@ -45,7 +59,11 @@
             this.label3 = new System.Windows.Forms.Label();
             this.cbSoundDevice = new System.Windows.Forms.ComboBox();
             this.btnNonsense = new System.Windows.Forms.Button();
+            this.rbtext = new System.Windows.Forms.RadioButton();
+            this.rbssml = new System.Windows.Forms.RadioButton();
+            this.cbbreath = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -56,24 +74,24 @@
             this.voicesListBox.ItemHeight = 16;
             this.voicesListBox.Location = new System.Drawing.Point(3, 3);
             this.voicesListBox.Name = "voicesListBox";
-            this.voicesListBox.Size = new System.Drawing.Size(344, 532);
+            this.voicesListBox.Size = new System.Drawing.Size(252, 644);
             this.voicesListBox.TabIndex = 0;
             // 
             // speechTextBox
             // 
             this.speechTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.speechTextBox.Location = new System.Drawing.Point(353, 3);
+            this.speechTextBox.Location = new System.Drawing.Point(261, 86);
             this.speechTextBox.Multiline = true;
             this.speechTextBox.Name = "speechTextBox";
-            this.speechTextBox.Size = new System.Drawing.Size(494, 492);
+            this.speechTextBox.Size = new System.Drawing.Size(586, 492);
             this.speechTextBox.TabIndex = 1;
             // 
             // sayItButton
             // 
             this.sayItButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.sayItButton.Location = new System.Drawing.Point(355, 501);
+            this.sayItButton.Location = new System.Drawing.Point(261, 584);
             this.sayItButton.Name = "sayItButton";
-            this.sayItButton.Size = new System.Drawing.Size(492, 33);
+            this.sayItButton.Size = new System.Drawing.Size(586, 33);
             this.sayItButton.TabIndex = 2;
             this.sayItButton.Text = "Say It (Ctrl+Enter)";
             this.sayItButton.UseVisualStyleBackColor = true;
@@ -101,21 +119,167 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.cbbreath);
+            this.panel1.Controls.Add(this.cbpitch);
+            this.panel1.Controls.Add(this.label9);
+            this.panel1.Controls.Add(this.cbtimbre);
+            this.panel1.Controls.Add(this.cbtone);
+            this.panel1.Controls.Add(this.label8);
+            this.panel1.Controls.Add(this.label7);
+            this.panel1.Controls.Add(this.cbvolume);
+            this.panel1.Controls.Add(this.label6);
+            this.panel1.Controls.Add(this.label5);
+            this.panel1.Controls.Add(this.cbspeed);
+            this.panel1.Controls.Add(this.groupBox2);
             this.panel1.Controls.Add(this.saveToFile);
             this.panel1.Controls.Add(this.voicesListBox);
             this.panel1.Controls.Add(this.speechTextBox);
             this.panel1.Controls.Add(this.sayItButton);
             this.panel1.Location = new System.Drawing.Point(6, 121);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(860, 579);
+            this.panel1.Size = new System.Drawing.Size(860, 662);
             this.panel1.TabIndex = 5;
+            // 
+            // cbpitch
+            // 
+            this.cbpitch.FormattingEnabled = true;
+            this.cbpitch.Location = new System.Drawing.Point(786, 4);
+            this.cbpitch.Name = "cbpitch";
+            this.cbpitch.Size = new System.Drawing.Size(71, 21);
+            this.cbpitch.TabIndex = 21;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label9.Location = new System.Drawing.Point(738, 4);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(42, 16);
+            this.label9.TabIndex = 20;
+            this.label9.Text = "Pitch";
+            // 
+            // cbtimbre
+            // 
+            this.cbtimbre.FormattingEnabled = true;
+            this.cbtimbre.Location = new System.Drawing.Point(659, 3);
+            this.cbtimbre.Name = "cbtimbre";
+            this.cbtimbre.Size = new System.Drawing.Size(75, 21);
+            this.cbtimbre.TabIndex = 19;
+            // 
+            // cbtone
+            // 
+            this.cbtone.FormattingEnabled = true;
+            this.cbtone.Location = new System.Drawing.Point(659, 40);
+            this.cbtone.Name = "cbtone";
+            this.cbtone.Size = new System.Drawing.Size(75, 21);
+            this.cbtone.TabIndex = 18;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.Location = new System.Drawing.Point(596, 41);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(44, 16);
+            this.label8.TabIndex = 17;
+            this.label8.Text = "Tone";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.Location = new System.Drawing.Point(596, 3);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(57, 16);
+            this.label7.TabIndex = 16;
+            this.label7.Text = "Timbre";
+            // 
+            // cbvolume
+            // 
+            this.cbvolume.FormattingEnabled = true;
+            this.cbvolume.Location = new System.Drawing.Point(513, 40);
+            this.cbvolume.Name = "cbvolume";
+            this.cbvolume.Size = new System.Drawing.Size(83, 21);
+            this.cbvolume.TabIndex = 15;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(457, 40);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(60, 16);
+            this.label6.TabIndex = 14;
+            this.label6.Text = "Volume";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(457, 3);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(54, 16);
+            this.label5.TabIndex = 13;
+            this.label5.Text = "Speed";
+            // 
+            // cbspeed
+            // 
+            this.cbspeed.FormattingEnabled = true;
+            this.cbspeed.Location = new System.Drawing.Point(513, 3);
+            this.cbspeed.Name = "cbspeed";
+            this.cbspeed.Size = new System.Drawing.Size(83, 21);
+            this.cbspeed.TabIndex = 5;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.rbnone);
+            this.groupBox2.Controls.Add(this.rbnews);
+            this.groupBox2.Controls.Add(this.rbconv);
+            this.groupBox2.Location = new System.Drawing.Point(261, 3);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(196, 77);
+            this.groupBox2.TabIndex = 4;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Voice Style (Matthew, Joanna Only)";
+            // 
+            // rbnone
+            // 
+            this.rbnone.AutoSize = true;
+            this.rbnone.Checked = true;
+            this.rbnone.Location = new System.Drawing.Point(108, 19);
+            this.rbnone.Name = "rbnone";
+            this.rbnone.Size = new System.Drawing.Size(51, 17);
+            this.rbnone.TabIndex = 2;
+            this.rbnone.TabStop = true;
+            this.rbnone.Text = "None";
+            this.rbnone.UseVisualStyleBackColor = true;
+            // 
+            // rbnews
+            // 
+            this.rbnews.AutoSize = true;
+            this.rbnews.Location = new System.Drawing.Point(7, 43);
+            this.rbnews.Name = "rbnews";
+            this.rbnews.Size = new System.Drawing.Size(81, 17);
+            this.rbnews.TabIndex = 1;
+            this.rbnews.Text = "Newscaster";
+            this.rbnews.UseVisualStyleBackColor = true;
+            // 
+            // rbconv
+            // 
+            this.rbconv.AutoSize = true;
+            this.rbconv.Location = new System.Drawing.Point(7, 19);
+            this.rbconv.Name = "rbconv";
+            this.rbconv.Size = new System.Drawing.Size(95, 17);
+            this.rbconv.TabIndex = 0;
+            this.rbconv.Text = "Conversational";
+            this.rbconv.UseVisualStyleBackColor = true;
             // 
             // saveToFile
             // 
             this.saveToFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.saveToFile.Location = new System.Drawing.Point(353, 540);
+            this.saveToFile.Location = new System.Drawing.Point(261, 623);
             this.saveToFile.Name = "saveToFile";
-            this.saveToFile.Size = new System.Drawing.Size(492, 33);
+            this.saveToFile.Size = new System.Drawing.Size(586, 33);
             this.saveToFile.TabIndex = 3;
             this.saveToFile.Text = "Save Audio To File";
             this.saveToFile.UseVisualStyleBackColor = true;
@@ -217,11 +381,46 @@
             this.btnNonsense.UseVisualStyleBackColor = true;
             this.btnNonsense.Click += new System.EventHandler(this.btnNonsense_Click);
             // 
+            // rbtext
+            // 
+            this.rbtext.AutoSize = true;
+            this.rbtext.Checked = true;
+            this.rbtext.Location = new System.Drawing.Point(670, 97);
+            this.rbtext.Name = "rbtext";
+            this.rbtext.Size = new System.Drawing.Size(46, 17);
+            this.rbtext.TabIndex = 8;
+            this.rbtext.TabStop = true;
+            this.rbtext.Text = "Text";
+            this.rbtext.UseVisualStyleBackColor = true;
+            // 
+            // rbssml
+            // 
+            this.rbssml.AutoSize = true;
+            this.rbssml.Location = new System.Drawing.Point(722, 97);
+            this.rbssml.Name = "rbssml";
+            this.rbssml.Size = new System.Drawing.Size(54, 17);
+            this.rbssml.TabIndex = 9;
+            this.rbssml.Text = "SSML";
+            this.rbssml.UseVisualStyleBackColor = true;
+            // 
+            // cbbreath
+            // 
+            this.cbbreath.AutoSize = true;
+            this.cbbreath.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbbreath.Location = new System.Drawing.Point(741, 41);
+            this.cbbreath.Name = "cbbreath";
+            this.cbbreath.Size = new System.Drawing.Size(93, 20);
+            this.cbbreath.TabIndex = 22;
+            this.cbbreath.Text = "Breathing";
+            this.cbbreath.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(871, 707);
+            this.ClientSize = new System.Drawing.Size(871, 795);
+            this.Controls.Add(this.rbssml);
+            this.Controls.Add(this.rbtext);
             this.Controls.Add(this.btnNonsense);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label2);
@@ -233,6 +432,8 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
@@ -258,6 +459,23 @@
         private System.Windows.Forms.CheckBox listenAndChat;
         private System.Windows.Forms.CheckBox delAfterSay;
         private System.Windows.Forms.Button btnNonsense;
+        private System.Windows.Forms.RadioButton rbtext;
+        private System.Windows.Forms.RadioButton rbssml;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ComboBox cbspeed;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.RadioButton rbnone;
+        private System.Windows.Forms.RadioButton rbnews;
+        private System.Windows.Forms.RadioButton rbconv;
+        private System.Windows.Forms.ComboBox cbvolume;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.ComboBox cbtimbre;
+        private System.Windows.Forms.ComboBox cbtone;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.ComboBox cbpitch;
+        private System.Windows.Forms.CheckBox cbbreath;
     }
 }
 
