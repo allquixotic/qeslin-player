@@ -37,13 +37,14 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.saveToFile = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.delAfterSay = new System.Windows.Forms.CheckBox();
+            this.listenAndChat = new System.Windows.Forms.CheckBox();
             this.button1 = new System.Windows.Forms.Button();
             this.lblCredsFile = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.cbSoundDevice = new System.Windows.Forms.ComboBox();
-            this.listenAndChat = new System.Windows.Forms.CheckBox();
-            this.delAfterSay = new System.Windows.Forms.CheckBox();
+            this.btnNonsense = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -57,7 +58,6 @@
             this.voicesListBox.Name = "voicesListBox";
             this.voicesListBox.Size = new System.Drawing.Size(344, 532);
             this.voicesListBox.TabIndex = 0;
-            this.voicesListBox.SelectedIndexChanged += new System.EventHandler(this.voicesListBox_SelectedIndexChanged);
             // 
             // speechTextBox
             // 
@@ -95,9 +95,9 @@
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(355, 94);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(164, 24);
+            this.label2.Size = new System.Drawing.Size(189, 24);
             this.label2.TabIndex = 4;
-            this.label2.Text = "Type Some Text";
+            this.label2.Text = "Type Some Text or";
             // 
             // panel1
             // 
@@ -136,6 +136,29 @@
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Options";
+            // 
+            // delAfterSay
+            // 
+            this.delAfterSay.AutoSize = true;
+            this.delAfterSay.Location = new System.Drawing.Point(538, 20);
+            this.delAfterSay.Name = "delAfterSay";
+            this.delAfterSay.Size = new System.Drawing.Size(120, 17);
+            this.delAfterSay.TabIndex = 12;
+            this.delAfterSay.Text = "Clear Text After Say";
+            this.delAfterSay.UseVisualStyleBackColor = true;
+            this.delAfterSay.CheckedChanged += new System.EventHandler(this.delAfterSay_CheckedChanged);
+            // 
+            // listenAndChat
+            // 
+            this.listenAndChat.AutoSize = true;
+            this.listenAndChat.Location = new System.Drawing.Point(405, 45);
+            this.listenAndChat.Name = "listenAndChat";
+            this.listenAndChat.Size = new System.Drawing.Size(332, 30);
+            this.listenAndChat.TabIndex = 11;
+            this.listenAndChat.Text = "Listen And Chat\r\nSelect this to chat and hear what\'s being played at the same tim" +
+    "e";
+            this.listenAndChat.UseVisualStyleBackColor = true;
+            this.listenAndChat.CheckedChanged += new System.EventHandler(this.listenAndChat_CheckedChanged);
             // 
             // button1
             // 
@@ -184,34 +207,22 @@
             this.cbSoundDevice.Size = new System.Drawing.Size(171, 21);
             this.cbSoundDevice.TabIndex = 0;
             // 
-            // listenAndChat
+            // btnNonsense
             // 
-            this.listenAndChat.AutoSize = true;
-            this.listenAndChat.Location = new System.Drawing.Point(405, 45);
-            this.listenAndChat.Name = "listenAndChat";
-            this.listenAndChat.Size = new System.Drawing.Size(332, 30);
-            this.listenAndChat.TabIndex = 11;
-            this.listenAndChat.Text = "Listen And Chat\r\nSelect this to chat and hear what\'s being played at the same tim" +
-    "e";
-            this.listenAndChat.UseVisualStyleBackColor = true;
-            this.listenAndChat.CheckedChanged += new System.EventHandler(this.listenAndChat_CheckedChanged);
-            // 
-            // delAfterSay
-            // 
-            this.delAfterSay.AutoSize = true;
-            this.delAfterSay.Location = new System.Drawing.Point(538, 20);
-            this.delAfterSay.Name = "delAfterSay";
-            this.delAfterSay.Size = new System.Drawing.Size(120, 17);
-            this.delAfterSay.TabIndex = 12;
-            this.delAfterSay.Text = "Clear Text After Say";
-            this.delAfterSay.UseVisualStyleBackColor = true;
-            this.delAfterSay.CheckedChanged += new System.EventHandler(this.delAfterSay_CheckedChanged);
+            this.btnNonsense.Location = new System.Drawing.Point(550, 94);
+            this.btnNonsense.Name = "btnNonsense";
+            this.btnNonsense.Size = new System.Drawing.Size(114, 23);
+            this.btnNonsense.TabIndex = 7;
+            this.btnNonsense.Text = "Generate Nonsense";
+            this.btnNonsense.UseVisualStyleBackColor = true;
+            this.btnNonsense.Click += new System.EventHandler(this.btnNonsense_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(871, 707);
+            this.Controls.Add(this.btnNonsense);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -246,6 +257,7 @@
         private System.Windows.Forms.Button saveToFile;
         private System.Windows.Forms.CheckBox listenAndChat;
         private System.Windows.Forms.CheckBox delAfterSay;
+        private System.Windows.Forms.Button btnNonsense;
     }
 }
 

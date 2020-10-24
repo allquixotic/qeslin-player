@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -12,7 +14,6 @@ using Amazon.Runtime;
 using CSCore;
 using CSCore.Codecs.MP3;
 using CSCore.CoreAudioAPI;
-using CSCore.DirectSound;
 using CSCore.SoundOut;
 using Microsoft.VisualBasic;
 using Newtonsoft.Json;
@@ -27,7 +28,7 @@ namespace PollyPlayer
         private readonly string settingsFileName = Environment.GetFolderPath(
             Environment.SpecialFolder.UserProfile) + Path.DirectorySeparatorChar + "qeslin-settings.json";
 
-        private readonly Dictionary<string, Voice> vozes = new Dictionary<string, Voice>();
+        private readonly SortedDictionary<string, Voice> vozes = new SortedDictionary<string, Voice>();
 
         public struct MySettings
         {
@@ -64,7 +65,6 @@ namespace PollyPlayer
         {
             var dvr = new DescribeVoicesRequest
             {
-                Engine = Engine.Neural,
                 IncludeAdditionalLanguageCodes = true
             };
             bool firstIter = true;
@@ -74,7 +74,10 @@ namespace PollyPlayer
             {
                 foreach (var voice in resp.Voices)
                 {
-                    vozes.Add(voice.Name + " (" + voice.LanguageName + ")", voice);
+                    string hq = "";
+                    if (voice.SupportedEngines.Contains("neural"))
+                        hq = "(HD) ";
+                    vozes.Add(hq + voice.Name + " (" + voice.LanguageName + ")", voice);
                 }
 
 
@@ -85,6 +88,8 @@ namespace PollyPlayer
 
                 firstIter = false;
             }
+
+            
 
             voicesListBox.DataSource = new BindingSource(vozes, null);
             voicesListBox.DisplayMember = "Key";
@@ -280,13 +285,14 @@ namespace PollyPlayer
                 }
             }
             cbSoundDevice.SelectedValue = devToSet;
+            this.voicesListBox.SelectedIndexChanged += new System.EventHandler(this.voicesListBox_SelectedIndexChanged);
         }
 
         private Stream RenderAudio(Voice voice)
         {
             var ssr = new SynthesizeSpeechRequest
             {
-                Engine = Engine.Neural,
+                Engine = voice.SupportedEngines.Contains("neural") ? Engine.Neural : Engine.Standard,
                 OutputFormat = "mp3",
                 LanguageCode = voice.LanguageCode,
                 VoiceId = voice.Id,
@@ -436,6 +442,55 @@ namespace PollyPlayer
         {
             sett.listenAndChat = listenAndChat.Checked;
             SaveSettings();
+        }
+
+        private void btnNonsense_Click(object sender, EventArgs e)
+        {
+            StringBuilder sb = new StringBuilder();
+            var rand = new Random();
+            int numWords = rand.Next(4, 31);
+            for (int i = 0; i < numWords; i++)
+            {
+                int wordLength = rand.Next(2, 15);
+                for (int j = 0; j < wordLength; j++)
+                {
+                    if (rand.Next(1, 5) == 1)
+                    {
+                        int vowel = rand.Next(1, 7);
+                        switch (vowel)
+                        {
+                            case 1:
+                                sb.Append('a');
+                                break;
+                            case 2:
+                                sb.Append('e');
+                                break;
+                            case 3:
+                                sb.Append('i');
+                                break;
+                            case 4:
+                                sb.Append('o');
+                                break;
+                            case 5:
+                                sb.Append('u');
+                                break;
+                            case 6:
+                                sb.Append('y');
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        char c = (char)rand.Next(0x0061, 0x007B);
+                        sb.Append(c);
+                    }
+                }
+
+                sb.Append(" ");
+            }
+
+            speechTextBox.Text = sb.ToString().Trim();
+
         }
     }
 }
